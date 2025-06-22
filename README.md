@@ -21,8 +21,8 @@ A lightweight Flask-based web application that compares product prices and ratin
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/flipkart-amazon-compare.git
-   cd flipkart-amazon-compare
+   git clone https://github.com/Tarun-Gautam-915/E-Commerce-Website-Comparator.git
+   cd E-Commerce-Website-Comparator
    ```
 
 2. **Create a virtual environment and activate it**
