@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-image: url({{ url_for('static', filename='bg.jpeg') }});
+        
+        }
+
+        div {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        #searchResults {
+            display: none; /* Hide initially */
+        }
+
+        #loadingIndicator {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        #AmazonData,
+        #FlipkartData {
+            max-height: 200px; /* Set the desired maximum height */
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Search your Items Here</h1>
+       
+        
+        <form onsubmit="searchItems(); return false;">
+            <input type="text" id="searchInput" placeholder="Enter your search term" required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="searchResults" style="margin: 15px;">
+            <div id="AmazonData" style="width: 45%; text-align: left;"></div>
+            <div id="FlipkartData" style="width: 45%; text-align: left;"></div>
+        </div>
+        <div id="loadingIndicator">Loading...</div>
+    </div>
+
+    <script>
+        async function searchItems() {
+            var searchInput = document.getElementById('searchInput').value;
+            var searchResultsContainer = document.getElementById('searchResults');
+            var loadingIndicator = document.getElementById('loadingIndicator');
+
+            loadingIndicator.style.display = 'block';
+
+            try {
+                var amazonData = await fetchDataFromFlask('amazonFunction', searchInput);
+                var flipkartData = await fetchDataFromFlask('flipkartFunction', searchInput);
+                amazonData = amazonData.replace(/\n/g, '<br>');
+                flipkartData = flipkartData.replace(/\n/g, '<br>');
+                if(amazonData == ""){
+                    amazonData = "No DATA FOUND or server error"
+                }
+                if(flipkartData == ""){
+                    flipkartData = "No DATA FOUND or server error"
+                }
+
+                document.getElementById('AmazonData').innerHTML = amazonData;
+                document.getElementById('FlipkartData').innerHTML = flipkartData;
+
+                searchResultsContainer.style.display = 'flex';
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        async function fetchDataFromFlask(functionName, searchTerm) {
+            return new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', `/api/${functionName}?searchTerm=${searchTerm}`, true);
+
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(xhr.responseText);
+                    } else {
+                        reject(new Error('Failed to fetch data'));
+                    }
+                };
+
+                xhr.onerror = function () {
+                    reject(new Error('Network error'));
+                };
+
+                xhr.send();
+            });
+        }
+    </script>
+</body>
+</html>

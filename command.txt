@@ -1,0 +1,3 @@
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
+"c:/Users/ADITYA/Desktop/Mini project/proj/env/Scripts/Activate.ps1"
+ flask --app app.py --debug run   
